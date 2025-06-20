@@ -37,8 +37,8 @@ const ImageProxy = ({
       originalSrc: String(src || ''),
       normalizedSrc: String(normalizedSrc || ''),
       currentSrc: String(currentSrc || ''),
-      fallbackIndex,
-      hasError,
+    fallbackIndex,
+    hasError,
       availableFallbacks: Array.isArray(fallbackSrc) ? fallbackSrc.map(f => String(f)) : []
     }, null, 2));
   }

@@ -67,21 +67,4 @@ export const checkAuthorImageExists = async (authorName) => {
   } catch {
     return false;
   }
-};
-
-// مكون React لعرض صورة المؤلف
-export const AuthorImage = ({ name, className = '', alt = '' }) => {
-  const imageSrc = getAuthorImage(name);
-  const altText = alt || `صورة ${name}`;
-  
-  return (
-    <img
-      src={imageSrc}
-      alt={altText}
-      className={className}
-      onError={(e) => {
-        e.target.src = '/images/authors/default-author.png';
-      }}
-    />
-  );
 }; 

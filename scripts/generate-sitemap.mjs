@@ -98,7 +98,7 @@ async function generateImageSitemap(articles) {
       hostname: siteUrl,
       xmlns: {
         image: true
-      }
+    }
     });
     
     const imageSitemapContent = await streamToPromise(

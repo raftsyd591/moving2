@@ -25,9 +25,9 @@ const MovingLargeAppliancesSafelyFridgeWasherAc = () => {
     >
       <div className="relative w-full h-96 overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-        <ImageProxy
-          src={post.image}
-          alt={post.title}
+        <ImageProxy 
+          src={post.image} 
+          alt={post.title} 
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -35,8 +35,8 @@ const MovingLargeAppliancesSafelyFridgeWasherAc = () => {
             <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
             <div className="flex items-center justify-center mb-4">
               <ImageProxy
-                src={post.authorImage}
-                alt={post.author}
+                src={post.authorImage} 
+                alt={post.author} 
                 className="w-12 h-12 rounded-full border-2 border-white mr-3"
               />
               <span>{post.author}</span>
@@ -90,7 +90,7 @@ const MovingLargeAppliancesSafelyFridgeWasherAc = () => {
               </div>
             </div>
           </div>
-
+          
           {/* Navigation */}
           <nav className="bg-gray-50 p-6 rounded-xl mb-8 border border-gray-200">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">محتويات الدليل المتقدم</h2>
@@ -287,7 +287,7 @@ const MovingLargeAppliancesSafelyFridgeWasherAc = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-teal-500 mr-2 mt-1">✓</span>
-                  <div>
+              <div>
                     <strong className="text-teal-800">أنظمة الاستشعار:</strong>
                     <p className="text-sm">حساسات دقيقة لوزن الملابس ومستوى الماء تحتاج معايرة بعد النقل.</p>
                   </div>
@@ -438,10 +438,10 @@ const MovingLargeAppliancesSafelyFridgeWasherAc = () => {
                   <div className="text-4xl mb-3">📡</div>
                   <h4 className="font-bold text-purple-700 mb-2">أنظمة مراقبة مستمرة</h4>
                   <p className="text-purple-600 text-sm">تتبع حالة الأجهزة طوال الرحلة</p>
-                </div>
               </div>
             </div>
-
+          </div>
+          
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white p-6 rounded-lg text-center shadow-md border-t-4 border-green-500">
                 <div className="text-4xl mb-3">🔬</div>
