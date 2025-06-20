@@ -1,9 +1,10 @@
 import React, { Suspense, lazy } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import BlogLayout from '../../components/blog/BlogLayout';
-import { articles } from '../../data/articles.jsx';
 import ImageProxy from '../../components/common/ImageProxy';
+import { articles } from '../../data/articles';
 import { fixArticleImage, getImagePathFromSlug } from '../../utils/fixArticleImages';
+import { getAuthorImage } from '../../utils/authorImages';
 
 // Helper to map slug to component path with better error handling
 const articleComponentMap = {
@@ -303,6 +304,9 @@ const BlogPost = () => {
 
   // Fix article image paths for the main post
   const fixedPost = post ? fixArticleImage(post) : null;
+  
+  // الحصول على صورة المؤلف
+  const authorImagePath = fixedPost ? getAuthorImage(fixedPost.author) : '/images/authors/default-author.png';
 
   // Handle post not found
   if (!post) {
@@ -453,11 +457,13 @@ const BlogPost = () => {
           <div className="text-center text-white p-4">
             <h1 className="text-4xl font-bold mb-4">{fixedPost.title}</h1>
             <div className="flex items-center justify-center mb-4">
-              <ImageProxy 
-                src={fixedPost.authorImage}
-                defaultSrc="/images/authors/default-author.png"
-                alt={fixedPost.author || 'كاتب'} 
-                className="w-12 h-12 rounded-full border-2 border-white mr-3"
+              <img
+                src={authorImagePath}
+                alt={`صورة ${fixedPost.author || 'المؤلف'}`}
+                className="w-12 h-12 rounded-full border-2 border-white mr-3 object-cover"
+                onError={(e) => {
+                  e.target.src = '/images/authors/default-author.png';
+                }}
               />
               <span>{fixedPost.author || 'كاتب'}</span>
               <span className="mx-3">•</span>
@@ -513,11 +519,13 @@ const BlogPost = () => {
           {/* Author Box */}
           <div className="bg-gray-50 p-6 rounded-lg my-8">
             <div className="flex flex-col md:flex-row items-center md:items-start">
-              <ImageProxy 
-                src={fixedPost.authorImage}
-                defaultSrc="/images/authors/default-author.png"
-                alt={fixedPost.author || 'كاتب'} 
-                className="w-24 h-24 rounded-full mb-4 md:mb-0 md:mr-6"
+              <img
+                src={authorImagePath}
+                alt={`صورة ${fixedPost.author || 'المؤلف'}`}
+                className="w-24 h-24 rounded-full mb-4 md:mb-0 md:mr-6 object-cover"
+                onError={(e) => {
+                  e.target.src = '/images/authors/default-author.png';
+                }}
               />
               <div>
                 <h3 className="text-xl font-bold mb-2">{fixedPost.author || 'كاتب'}</h3>

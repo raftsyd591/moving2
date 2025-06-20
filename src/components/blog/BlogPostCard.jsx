@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ImageProxy from '../common/ImageProxy';
 import { getImagePathFromSlug } from '../../utils/fixArticleImages';
 import { getAlternativeImagePaths } from '../../utils/imageHelpers';
+import { getAuthorImage } from '../../utils/authorImages';
 
 /**
  * مكون بطاقة عرض المقال
@@ -112,6 +113,9 @@ const BlogPostCard = ({ post }) => {
     return getAlternativeImagePaths(post.slug);
   };
 
+  // الحصول على صورة المؤلف
+  const authorImagePath = getAuthorImage(post.author);
+
   return (
     <div 
       ref={cardRef}
@@ -175,16 +179,14 @@ const BlogPostCard = ({ post }) => {
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center">
               {isVisible ? (
-                <ImageProxy
-                  src={post.authorImage || '/images/authors/default-author.png'}
-                  fallbackSrc={[
-                    `/images/authors/${post.author?.toLowerCase()?.replace(/\s+/g, '_')}.jpg`,
-                    `/images/authors/${post.author?.toLowerCase()?.replace(/\s+/g, '_')}.png`
-                  ]}
-                  defaultSrc="/images/authors/default-author.png"
-                  alt={post.author || 'كاتب'}
-                  className="w-8 h-8 rounded-full ml-2 border-2 border-gray-100"
+                <img
+                  src={authorImagePath}
+                  alt={`صورة ${post.author || 'المؤلف'}`}
+                  className="w-8 h-8 rounded-full ml-2 border-2 border-gray-100 object-cover"
                   loading="lazy"
+                  onError={(e) => {
+                    e.target.src = '/images/authors/default-author.png';
+                  }}
                 />
               ) : (
                 <div className="w-8 h-8 rounded-full ml-2 bg-gray-200 animate-pulse"></div>
