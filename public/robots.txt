@@ -1,0 +1,49 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://www.elitemovers.com.sa/sitemap.xml
+Sitemap: https://www.elitemovers.com.sa/sitemap-images.xml
+Sitemap: https://www.elitemovers.com.sa/sitemap-news.xml
+
+# Optimize crawling
+Crawl-delay: 1
+
+# Block admin areas (if any)
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+# Allow important files
+Allow: /images/
+Allow: /css/
+Allow: /js/
+
+# Block search parameters
+Disallow: /*?*
+Allow: /*?utm_*
+
+# Block duplicate content
+Disallow: /print/
+Disallow: /mobile/
+
+# Special instructions for search engines
+User-agent: Googlebot
+Crawl-delay: 1
+
+User-agent: Bingbot
+Crawl-delay: 2
+
+User-agent: Slurp
+Crawl-delay: 2
+
+# Block problematic bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /

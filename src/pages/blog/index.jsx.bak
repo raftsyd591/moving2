@@ -1,0 +1,134 @@
+﻿import React, { useState } from 'react';
+import BlogPostCard from '../../components/blog/BlogPostCard';
+import BlogLayout from '../../components/blog/BlogLayout';
+import { articles } from '../../data/articles.js';
+
+// Extract unique categories from articles
+const uniqueCategories = [...new Set(articles.map(article => article.category))];
+const categories = [
+  { id: "all", name: "Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ù‚Ø§Ù„Ø§Øª" },
+  ...uniqueCategories.map(cat => ({ id: cat.toLowerCase(), name: cat }))
+];
+
+// Schema.org markup for BlogPosting list
+const blogListingSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": articles.map((post, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "datePublished": post.date,
+      "author": {
+        "@type": "Person",
+        "name": post.author
+      },
+      "image": post.image,
+      "url": `/blog/${post.slug}`
+    }
+  }))
+};
+
+const BlogIndex = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const postsPerPage = 9;
+  
+  // Filter posts by category if needed
+  const filteredPosts = activeCategory === "all" 
+    ? articles 
+    : articles.filter(post => post.category.toLowerCase().includes(activeCategory));
+  
+  // Calculate pagination
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  
+  const handleCategoryChange = (categoryId) => {
+    setActiveCategory(categoryId);
+    setCurrentPage(1); // Reset to first page when changing category
+  };
+  
+  return (
+    <BlogLayout 
+      title="Ù…Ø¯ÙˆÙ†Ø© Ø§Ù„Ù†Ø®Ø¨Ø© Ù„Ù„Ù†Ù‚Ù„ | Ø¢Ø®Ø± Ø§Ù„Ù…Ù‚Ø§Ù„Ø§Øª ÙˆØ§Ù„Ù†ØµØ§Ø¦Ø­ Ø­ÙˆÙ„ Ù†Ù‚Ù„ Ø§Ù„Ø¹ÙØ´"
+      description="Ø§Ø³ØªÙƒØ´Ù Ø£Ø­Ø¯Ø« Ø§Ù„Ù…Ù‚Ø§Ù„Ø§Øª ÙˆØ§Ù„Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø­ÙˆÙ„ Ù†Ù‚Ù„ Ø§Ù„Ø¹ÙØ´ ÙÙŠ Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©. Ù†ØµØ§Ø¦Ø­ØŒ Ø¥Ø±Ø´Ø§Ø¯Ø§ØªØŒ ÙˆØªØ¬Ø§Ø±Ø¨ Ù…Ù† Ø®Ø¨Ø±Ø§Ø¡ Ù†Ù‚Ù„ ÙˆØªØ®Ø²ÙŠÙ† Ø§Ù„Ø£Ø«Ø§Ø« Ù„ØªØ³Ù‡ÙŠÙ„ Ø§Ù†ØªÙ‚Ø§Ù„Ùƒ Ù„Ù…Ù†Ø²Ù„ Ø¬Ø¯ÙŠØ¯."
+      keywords="Ù…Ø¯ÙˆÙ†Ø© Ù†Ù‚Ù„ Ø¹ÙØ´ØŒ Ù…Ù‚Ø§Ù„Ø§Øª Ø¹Ù† Ù†Ù‚Ù„ Ø§Ù„Ø£Ø«Ø§Ø«ØŒ Ù†ØµØ§Ø¦Ø­ Ù†Ù‚Ù„ØŒ ØªØºÙ„ÙŠÙ Ø£Ø«Ø§Ø«ØŒ ØªØ®Ø²ÙŠÙ† Ø¹ÙØ´ØŒ Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©"
+      canonicalUrl="https://elitemovers.com/blog"
+      ogImage="/images/blog-cover.jpg"
+    >
+      <script type="application/ld+json">
+        {JSON.stringify(blogListingSchema)}
+      </script>
+      
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Ù…Ø¯ÙˆÙ†Ø© Ø§Ù„Ù†Ø®Ø¨Ø© Ù„Ù„Ù†Ù‚Ù„</h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Ø§Ø³ØªÙƒØ´Ù Ø£Ø­Ø¯Ø« Ø§Ù„Ù…Ù‚Ø§Ù„Ø§Øª ÙˆØ§Ù„Ù†ØµØ§Ø¦Ø­ Ø­ÙˆÙ„ Ù†Ù‚Ù„ Ø§Ù„Ø¹ÙØ´ ÙˆØ§Ù„Ø£Ø«Ø§Ø« ÙÙŠ Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©ØŒ Ù…Ù‚Ø¯Ù…Ø© Ù…Ù† Ø®Ø¨Ø±Ø§Ø¡ Ù…ØªØ®ØµØµÙŠÙ† ÙÙŠ Ø§Ù„Ù…Ø¬Ø§Ù„
+          </p>
+        </div>
+        
+        {/* Category Filter */}
+        <div className="flex flex-wrap justify-center gap-3 mb-10 rtl">
+          {categories.map((category) => (
+            <button 
+              key={category.id}
+              onClick={() => handleCategoryChange(category.id)}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                activeCategory === category.id
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+        
+        {/* Blog Posts Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {currentPosts.length > 0 ? (
+            currentPosts.map((post) => (
+              <BlogPostCard key={post.slug} post={post} />
+            ))
+          ) : (
+            <div className="col-span-3 text-center py-12">
+              <h2 className="text-2xl font-bold text-gray-700 mb-4">Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ù‚Ø§Ù„Ø§Øª ÙÙŠ Ù‡Ø°Ù‡ Ø§Ù„ÙØ¦Ø©</h2>
+              <p className="text-gray-600">Ø­Ø§ÙˆÙ„ Ø§Ø®ØªÙŠØ§Ø± ÙØ¦Ø© Ø£Ø®Ø±Ù‰ Ø£Ùˆ Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ø§Ø­Ù‚Ø§Ù‹</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-12">
+            <ul className="flex space-x-2 rtl:space-x-reverse">
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <li key={index}>
+                  <button
+                    onClick={() => paginate(index + 1)}
+                    className={`px-4 py-2 rounded-md ${
+                      currentPage === index + 1
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </BlogLayout>
+  );
+};
+
+export default BlogIndex; 

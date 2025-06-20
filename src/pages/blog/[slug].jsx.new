@@ -1,0 +1,212 @@
+// Componente para mostrar un artículo individual del blog
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import BlogLayout from '../../components/blog/BlogLayout';
+import { articles } from '../../data/articles.jsx';
+import ImageProxy from '../../components/common/ImageProxy';
+import { extractContent } from '../../utils/extractArticleContent';
+import { fixArticleImage, getImagePathFromSlug } from '../../utils/fixArticleImages';
+
+const BlogPost = () => {
+  const { slug } = useParams();
+  const [content, setContent] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+  
+  // Find the post by slug
+  const post = articles.find((article) => article.slug === slug);
+  
+  // Fix article image paths for the main post
+  const fixedPost = post ? fixArticleImage(post) : null;
+  
+  // Load article content when component mounts or slug changes
+  useEffect(() => {
+    if (slug && post) {
+      setIsLoading(true);
+      setError(false);
+      
+      try {
+        const articleContent = extractContent(slug, post);
+        setContent(articleContent || '');
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error loading article content:', err);
+        setError(true);
+        setIsLoading(false);
+      }
+    } else {
+      setIsLoading(false);
+    }
+  }, [slug, post]);
+  
+  // Handle post not found
+  if (!post) {
+    return (
+      <BlogLayout
+        title="المقال غير موجود | النخبة للنقل"
+        description="عذراً، لم نتمكن من العثور على المقال الذي تبحث عنه."
+        canonicalUrl={`https://elitemovers.com/blog/not-found`}
+      >
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-3xl font-bold mb-4">المقال غير موجود</h1>
+          <p className="mb-8">عذراً، لم نتمكن من العثور على المقال الذي تبحث عنه.</p>
+          <Link to="/blog" className="bg-primary-600 text-white px-6 py-3 rounded-md">
+            العودة إلى المدونة
+          </Link>
+        </div>
+      </BlogLayout>
+    );
+  }
+  
+  // استخدام وقت القراءة المحدد مسبقًا أو حسابه إذا لم يكن موجودًا
+  const readingTime = fixedPost.readTime || Math.max(1, Math.ceil((content?.split(' ')?.length || 0) / 200));
+  
+  // المقالات ذات الصلة - إيجاد المقالات في نفس الفئة أو بواسطة نفس الكاتب
+  const relatedPosts = articles
+    .filter((article) => 
+      article.slug !== slug && 
+      (article.category === fixedPost.category || article.author === fixedPost.author)
+    )
+    .slice(0, 3)
+    .map(article => fixArticleImage(article)); // Fix images for related posts too
+  
+  // إنشاء مسارات صور بديلة بناءً على slug المقال
+  const getAlternativeImagePaths = (articleSlug) => {
+    if (!articleSlug) return [];
+    
+    // استخدام وظيفة getImagePathFromSlug لتحديد المسار الرئيسي
+    const primaryPath = getImagePathFromSlug(articleSlug);
+    
+    const safeSlug = articleSlug.replace(/-/g, '_');
+    const originalSlug = articleSlug;
+    
+    // إرجاع مصفوفة من المسارات المحتملة، بدءًا بالمسار الرئيسي
+    return [
+      primaryPath, // المسار الرئيسي أولاً
+      `/public/images/blog/${safeSlug}.jpeg`,
+      `/public/images/blog/${safeSlug}.jpg`,
+      `/public/images/blog/${originalSlug}.jpeg`,
+      `/public/images/blog/${originalSlug}.jpg`,
+      `/images/blog/${safeSlug}.jpeg`,
+      `/images/blog/${safeSlug}.jpg`,
+      `/images/blog/${originalSlug}.jpeg`,
+      `/images/blog/${originalSlug}.jpg`
+    ].filter(Boolean); // إزالة القيم الفارغة
+  };
+  
+  return (
+    <BlogLayout
+      title={`${fixedPost.title || 'مقال'} | النخبة للنقل`}
+      description={fixedPost.excerpt || fixedPost.title || 'مقال على مدونة النخبة للنقل'}
+      keywords={fixedPost.keywords || ''}
+      canonicalUrl={`https://elitemovers.com/blog/${fixedPost.slug}`}
+      ogImage={fixedPost.image || getImagePathFromSlug(fixedPost.slug) || "/images/blog/default-blog-post.jpg"}
+    >
+      {/* Hero Section */}
+      <div className="relative w-full h-96 overflow-hidden">
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <ImageProxy 
+          src={fixedPost.image}
+          fallbackSrc={getAlternativeImagePaths(fixedPost.slug)}
+          defaultSrc="/images/blog/default-blog-post.jpg"
+          alt={fixedPost.title || 'صورة المقال'} 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white p-4">
+            <h1 className="text-4xl font-bold mb-4">{fixedPost.title}</h1>
+            <div className="flex items-center justify-center mb-4">
+              <span>{fixedPost.author || 'كاتب'}</span>
+              <span className="mx-3">•</span>
+              <span>{fixedPost.date || 'تاريخ غير محدد'}</span>
+              <span className="mx-3">•</span>
+              <span>{readingTime} دقائق للقراءة</span>
+            </div>
+            <div className="mt-4">
+              <span className="bg-primary-600 text-white px-3 py-1 rounded-full text-sm">
+                {fixedPost.category || 'عام'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Article Content */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-3xl mx-auto">
+          {/* Loading/Error States */}
+          {isLoading && (
+            <div className="text-center py-8">
+              <p>جاري تحميل المقال...</p>
+            </div>
+          )}
+          
+          {error && !isLoading && (
+            <div className="bg-red-100 p-4 rounded text-red-700 text-center">
+              <p>حدث خطأ أثناء تحميل المقال. يرجى المحاولة مرة أخرى.</p>
+            </div>
+          )}
+          
+          {/* Article Body */}
+          {!isLoading && !error && (
+            <div className="prose prose-lg max-w-none rtl">
+              {content ? (
+                <div dangerouslySetInnerHTML={{ __html: content }} />
+              ) : (
+                <p>المحتوى قيد الإعداد. سيتم إضافته قريباً.</p>
+              )}
+            </div>
+          )}
+          
+          {/* Share Links */}
+          <div className="border-t border-b border-gray-200 py-6 my-8">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-bold mb-2">مشاركة المقال</h3>
+                <div className="flex space-x-4 rtl:space-x-reverse">
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=https://elitemovers.com/blog/${fixedPost.slug}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+                    فيسبوك
+                  </a>
+                  <a href={`https://twitter.com/intent/tweet?url=https://elitemovers.com/blog/${fixedPost.slug}&text=${encodeURIComponent(fixedPost.title || '')}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-600">
+                    تويتر
+                  </a>
+                  <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent((fixedPost.title || '') + ' https://elitemovers.com/blog/' + fixedPost.slug)}`} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-800">
+                    واتساب
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Related Posts */}
+        {relatedPosts.length > 0 && (
+          <div className="max-w-5xl mx-auto mt-16">
+            <h2 className="text-2xl font-bold mb-6">مقالات ذات صلة</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {relatedPosts.map((relatedPost) => (
+                <div key={relatedPost.slug} className="bg-white shadow-md rounded-lg overflow-hidden">
+                  <Link to={`/blog/${relatedPost.slug}`}>
+                    <ImageProxy 
+                      src={relatedPost.image}
+                      fallbackSrc={getAlternativeImagePaths(relatedPost.slug)}
+                      defaultSrc="/images/blog/default-blog-post.jpg"
+                      alt={relatedPost.title || 'مقال ذو صلة'}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="font-bold mb-2">{relatedPost.title || 'مقال ذو صلة'}</h3>
+                      <p className="text-gray-600 text-sm line-clamp-2">{relatedPost.excerpt || 'مقال ذو صلة بالموضوع الحالي'}</p>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </BlogLayout>
+  );
+};
+
+export default BlogPost;
